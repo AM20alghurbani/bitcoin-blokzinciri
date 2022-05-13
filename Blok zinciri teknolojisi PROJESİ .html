@@ -1,0 +1,143 @@
+<html>
+    <head>
+        <!---Lib For function in JS-->
+<script src=”https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js" 
+        integrity=”sha256-cVdRFpfbdE04SloqhkavI/PJBWCr+TuyQP3WkLKaiYo=” 
+        crossorigin=”anonymous”></script>
+         <script type="text/javascript">
+    function calculateHash(block){
+        return sha256(block.index + block.previousHash + 
+         block.timestamp + block.data + 
+         block.nonce);
+}
+
+    class Block {
+ constructor(index, previousHash, timestamp, data) {
+   this.index = index;
+   this.previousHash = previousHash;
+   this.timestamp = timestamp;
+   this.data = data;
+   this.nonce = 0;
+   this.hash = calculateHash(this); // defined later
+ }
+}
+Block.prototype.mineBlock = function(difficulty) {
+ this.nonce = 0;
+ var zeros = "0".repeat(difficulty);
+
+ while (this.hash.substring(0, difficulty) != zeros) {
+   this.nonce++;
+   this.hash = calculateHash(this);
+ }
+
+}
+class Blockchain{
+    constructor(difficulty) {
+    this.difficulty = difficulty;
+    this.blocks = [];
+    var genesisBlock = new Block(0, null,Date.now(), "Genesis block");
+    this.blocks.push(genesisBlock);
+
+}
+}
+Blockchain.prototype.newBıock=function(data){
+    var latesBlock =this.block[this.blocks.length-1 ];
+    return new Block (latesBlock.index+1,latesBlock.hash,
+    Date.now(),date);
+}
+
+Blockchain.prototype.addBlock = function(block) {
+ block.mineBlock(this.difficulty);
+ this.blocks.push(block);
+}
+
+Blockchain.prototype.isFirstBlockValid = function() {
+ var firstBlock = this.blocks[0];
+ 
+ if (firstBlock.index != 0)
+   return false;
+   
+ if (firstBlock.previousHash != null)
+   return false;
+   
+ if (firstBlock.hash == null ||
+       calculateHash(firstBlock) != firstBlock.hash)
+    return false;
+    
+ return true; 
+}
+
+Blockchain.prototype.isValidBlock = function (block, previousBlock) {
+ if (previousBlock.index + 1 != block.index)
+    return false;
+    
+ if (block.previousHash == null  ||
+        block.previousHash != previousBlock.hash)
+    return false;
+    
+ if (block.hash == null ||
+        calculateHash(block) != block.hash)
+    return false;
+    
+ return true;
+}
+
+Blockchain.prototype.isBlockchainValid = function() {
+ if (!this.isFirstBlockValid())
+    return false;
+    
+ for (var i = 1; i < this.blocks.length; i++) {
+    var block = this.blocks[i];
+    var previousBlock = this.blocks[i - 1];
+    
+    if (!this.isValidBlock(block, previousBlock))
+       return false;
+ }
+ 
+ return true;
+}
+
+Blockchain.prototype.display= function() {
+    for(var i=0; i<this .blocks.length; i++){
+        var block= this.blocks[i];
+        var str="Block #" +blok.index + "["+
+        "previousHash:" +block.previousHash + ","+
+        "timestamp:" +block.timestamp + ","+
+        "data: " +block.data + ","+
+        "hash: " +block.hash + "]"
+        console.log(str);
+    }
+}
+
+window.addEventListener("DOMContentLoaded",(event)=>{
+    var blockchain = new Blockchain(4);
+ var block1 = blockchain.newBlock("Second Block");
+ blockchain.addBlock(block1);
+ var block2 = blockchain.newBlock("Third Block");
+ blockchain.addBlock(block2);
+ var block3 = blockchain.newBlock("Fourth Block");
+ blockchain.addBlock(block3);
+
+ console.log("first test of our Blockchain"); 
+
+
+ console.log("Blockchain Validity: " + blockchain.isBlockchainValid());
+});
+
+
+
+blockchain.display();
+
+var block4 = new Block(12, "falseHash", Date.now(), "Block Invalid");
+blockchain.addBlock(block4);
+
+console.log("Blockchain Validity after corruption: " + blockchain.isBlockchainValid());
+
+blockchain.display();
+
+
+     </script>
+    </head>
+    <body>
+    </body>
+</html>
